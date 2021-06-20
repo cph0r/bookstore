@@ -1,0 +1,28 @@
+<h1>Search Book</h1>
+<div>
+<select class="js-data-example-ajax"></select>  
+</div>
+<div class="clearfix">
+<button type="button" onclick="hide_modal()" class="cancelbtn">Cancel</button>
+<button type="button" onclick="hide_modal()" class="deletebtn">Add</button>
+</div>
+
+<script>
+$('#mySelect2').select2({
+  ajax: {
+    url: 'https://api.github.com/orgs/select2/repos',
+    data: function (params) {
+      var query = {
+        search: params.term,
+        type: 'public'
+      }
+    processResults: function (data) {
+      // Transforms the top-level key of the response object from 'items' to 'results'
+      return {
+        results: data.items
+      };
+    }
+    }
+  }
+});
+<script>

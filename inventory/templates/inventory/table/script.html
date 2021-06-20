@@ -1,0 +1,20 @@
+<script>
+function crud(action){
+    alert(action)
+    $.ajax({
+    type : "GET",
+    url : action+'/',
+    datatype : "text/plain",
+    contentType: "text/plain",
+    success : function(data) {
+        $('#modal_div').html(data)
+    },
+    error : function(error) {
+
+    },
+});
+}
+    $(document).ready(function() {
+        $('#table_id').DataTable();
+    })
+</script>

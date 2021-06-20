@@ -1,0 +1,24 @@
+
+<!DOCTYPE>
+    <html>
+    <head>
+ {% include "inventory/imports/js.html" %}
+{% include "inventory/imports/css.html" %}
+    <title>
+        Book Store
+    </title>    
+    <head>
+{%  include 'inventory/imports/style.html' %}
+    <body>
+    <div id='modal_div'></div>
+    <button type='button' onclick="crud('add')" style=" width:auto;padding:10px;margin-left:100px;margin-top:10px"><i class="fa fa-plus-circle"></i>    ADD</button>
+    <div style="padding:100px">
+    {% include "inventory/table/table.html" %}
+<div>
+
+{% include "inventory/table/script.html" %}
+
+</body>
+</html>
+
+
