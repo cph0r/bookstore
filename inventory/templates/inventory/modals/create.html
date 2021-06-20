@@ -5,7 +5,7 @@
 <div style="display:flex;flex-direction:column">
 
 <label>Select Book
-<select required  onchange="fetch_details(this.value)" name='book_id' class="js-data-example-ajax" style="width:200px;position:inherit;margin-bottom:10px"placeholder="Type Book name..">
+<select required  id='select_book' onchange="fetch_details(this.value)" name='book_id' class="js-data-example-ajax" style="width:200px;position:inherit;margin-bottom:10px"placeholder="Type Book name..">
 {% if selected%}  <option value="{{ selected.book_id }}" selected="selected">{{selected.name}}</option>{% endif %}
 </select> 
 </label>
@@ -58,7 +58,7 @@ $('.js-data-example-ajax').select2({
 });
 
 $('#create_form').submit(function(eventObj) {
-    let text = $(".js-data-example-ajax").text()
+    let text = data[0].text.trim()
     $(this).append('<input type="hidden" name="name" value="'+text+'" />');
     return true;
 });
