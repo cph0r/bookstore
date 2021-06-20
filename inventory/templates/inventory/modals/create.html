@@ -5,12 +5,12 @@
 <div style="display:flex;flex-direction:column">
 
 <label>Select Book
-<select required onchange="fetch_details(this.value)" name='book_id' class="js-data-example-ajax" style="width:200px;position:inherit;margin-bottom:10px"placeholder="Type Book name..">
+<select required  onchange="fetch_details(this.value)" name='book_id' class="js-data-example-ajax" style="width:200px;position:inherit;margin-bottom:10px"placeholder="Type Book name..">
 {% if selected%}  <option value="{{ selected.book_id }}" selected="selected">{{selected.name}}</option>{% endif %}
-</select>  
+</select> 
 </label>
 <label>Select Stock
-<input name='stock' type="number" required {%if selected %}value="{{selected.stock}}"{%endif%}></input>
+<input name='stock' id='select_stock' type="number" required {%if selected %}value="{{selected.stock}}"{%endif%}></input>
 <div id='select_block' style="display:{%if selected %}flex{% else %}none{% endif %};flex-direction:column">   
 <img id='photo' {%if selected %}src="{{ thumbnail }}"{%endif%} style="display: block;
   margin-left: auto;
@@ -31,6 +31,16 @@
 <form>
 
 <script>
+$('#select_stock').on('input',function(){
+  let value = this.value
+  var numbers = /^[0-9]+$/;
+  if(value.match(numbers)){
+    
+ }else{
+    this.value = value.substring(0, value.length);
+ }
+})
+
 $('.js-data-example-ajax').select2({
   ajax: {
     url: 'https://www.googleapis.com/books/v1/volumes',
