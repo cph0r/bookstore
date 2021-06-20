@@ -6,36 +6,36 @@ from django.shortcuts import render
 
 import inventory.models as models
 from .constants import *
-import requests
-
 
 def index(request):
-    if request.POST == POST:
+    if request.method == POST:
         print(POST)
     records = getattr(models, BOOK_STORE_TABLE).objects.all();
-    print(records)
-    print(records.count())
     return render(request, BASE_PATH, {ENTRIES:records})
 
 
 def add(request):
-    if request.POST == POST:
+    if request.method == POST :
         print(POST)
+        print(request.POST)
         try:
             entry_map = {NAME: request.POST.get(NAME),
-                         STOCK: request.POST.get(STOCK)}
+                         STOCK: request.POST.get(STOCK),
+                         BOOK_ID:request.POST.get(BOOK_ID)}
             append_creation_details(entry_map,ADDED_AT)
+            print(entry_map)
             record = getattr(
                 models, BOOK_STORE_TABLE).objects.update_or_create(**entry_map)
             data = {RESPONSE: SUCCESS}
         except Exception as ex:
+            print(ex)
             data = {RESPONSE: FAILURE}
         return JsonResponse(data, safe=False)
     return render(request, BASE_MODAL_PATH, {INPUT_PATH:CREATE_PATH})
 
 
 def delete(request, book_id):
-    if request.POST == POST:
+    if request.method == POST:
         print(POST)
         try:
             record = getattr(models, BOOK_STORE_TABLE).objects.get(
@@ -54,7 +54,7 @@ def view(request, book_id):
 
 
 def update(request, book_id):
-    if request.POST == POST:
+    if request.method == POST:
         print(POST)
         try:
             record = getattr(models, BOOK_STORE_TABLE).objects.get(pk=book_id)
@@ -68,14 +68,8 @@ def update(request, book_id):
         return JsonResponse(data, safe=False)
 
     record = getattr(models, BOOK_STORE_TABLE).objects.get(pk=book_id)
-    return render(request, BASE_MODAL_PATH, {INPUT_PATH:CREATE_PATH})
+    return render(request, BASE_MODAL_PATH, {INPUT_PATH:CREATE_PATH,SELECTED:record})
 
-
-def search(request, query):
-    request.POST
-    response = requests.get("https://api.open-notify.org/this-api-doesnt-exist")
-    data= {}
-    return JsonResponse(data,safe=False)
 
 def append_creation_details(entry_map, key):
     entry_map[key] = datetime.datetime.now()

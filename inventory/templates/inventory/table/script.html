@@ -10,7 +10,6 @@ function crud(action,book_id){
     datatype : "text/plain",
     contentType: "text/plain",
     success : function(data) {
-        console.log(data)
         $('#modal_div').html(data);
     },error : function(error) {
     },

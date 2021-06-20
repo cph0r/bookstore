@@ -1,33 +1,45 @@
+<form id='create_form' method='POST' action='/bookstore/add/'>
+{%csrf_token %}
 <h1>Search Book</h1>
 <div style="display:flex;flex-direction:column">
 <label>Select Book
-<select class="js-data-example-ajax" style="width:200px;position:inherit;margin-bottom:10px"placeholder="Type Book name.."></select>  
+<select required name='book_id' class="js-data-example-ajax" style="width:200px;position:inherit;margin-bottom:10px"placeholder="Type Book name..">
+{% if selected%}  <option value="{{ selected.book_id }}" selected="selected">{{selected.name}}</option>{% endif %}
+</select>  
 </label>
 <label>Select Stock
-<input type="number"></input>
+<input name='stock' type="number" required {%if selected %}value="{{selected.stock}}"{%endif%}></input>
 </label>  
 </div>
 <div class="clearfix">
 <button type="button" onclick="hide_modal()" class="cancelbtn">Cancel</button>
-<button type="button" onclick="hide_modal()" class="deletebtn">Add</button>
+<button type="submit" class="deletebtn">Add</button>
 </div>
+<form>
 
 <script>
-{% comment %} $('#mySelect2').select2({
-    ajax: {
-    url: 'https://api.github.com/orgs/select2/repos',
-    data: function (params) {
-      var query = {
-        search: params.term,
-        type: 'public'
-      }
+$('.js-data-example-ajax').select2({
+  ajax: {
+    url: 'https://www.googleapis.com/books/v1/volumes',
+    data: function (params) {return 'q='+params.term},
+    dataType: 'json',
     processResults: function (data) {
-      // Transforms the top-level key of the response object from 'items' to 'results'
-      return {
-        results: data.items
-      };
-    } 
-    }
+        let data_array = []
+    
+        $.each(data.items,function(index,value){
+            console.log(value)
+            data_array.push({
+                'id' : value.id,'text':value.volumeInfo.title})
+        });
+        console.log(data_array)
+      return {results: data_array};
+    }   
   }
-}); {% endcomment %}
+});
+
+$('#create_form').submit(function(eventObj) {
+    let text = $(".js-data-example-ajax").text()
+    $(this).append('<input type="hidden" name="name" value="'+text+'" />');
+    return true;
+});
 </script>
