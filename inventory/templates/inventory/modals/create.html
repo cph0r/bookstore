@@ -1,5 +1,5 @@
-<form id='create_form' method='POST' action={%if selected %}'/bookstore/update/{{selected.id}}/'{% else%}
-    '/bookstore/add/'{%endif%}>
+<form id='create_form' method='POST' action={%if selected %}'/update/{{selected.id}}/'{% else%}
+    '/add/'{%endif%}>
 {%csrf_token %}
 <h1>Search Book</h1>
 <div style="display:flex;flex-direction:column">
