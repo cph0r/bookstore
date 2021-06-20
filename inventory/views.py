@@ -45,17 +45,8 @@ def delete(request, book_id):
 
 def view(request, book_id):
     record = getattr(models, BOOK_STORE_TABLE).objects.get(pk=book_id)
-    master_book_id = getattr(record,BOOK_ID)
-    result = requests.get('https://www.googleapis.com/books/v1/volumes/'+master_book_id)
-    result = result.json()
     active_fields = {INPUT_PATH:VIEW_PATH,SELECTED:record}
-    active_fields.update({
-    'author' : result['volumeInfo']['authors'][0],
-    'publisher' : result['volumeInfo']['publisher'],
-    'publishing_date' : result['volumeInfo']['publishedDate'],
-    'page_count' :result['volumeInfo']['pageCount'],
-    'thumbnail' : result['volumeInfo']['imageLinks']['smallThumbnail'],
-    'language' : result['volumeInfo']['language'].upper() })
+    update_active_fields(record, active_fields)
     return render(request, BASE_MODAL_PATH, active_fields)
 
 
@@ -79,6 +70,10 @@ def update(request, book_id):
         return redirect(MAIN_VIEW)
     record = getattr(models, BOOK_STORE_TABLE).objects.get(pk=book_id)
     active_fields = {INPUT_PATH:CREATE_PATH,SELECTED:record}
+    update_active_fields(record, active_fields)
+    return render(request, BASE_MODAL_PATH, active_fields)
+
+def update_active_fields(record, active_fields):
     master_book_id = getattr(record,BOOK_ID)
     result = requests.get('https://www.googleapis.com/books/v1/volumes/'+master_book_id)
     result = result.json()
@@ -89,4 +84,3 @@ def update(request, book_id):
     'page_count' :result['volumeInfo']['pageCount'],
     'thumbnail' : result['volumeInfo']['imageLinks']['smallThumbnail'],
     'language' : result['volumeInfo']['language'].upper() })
-    return render(request, BASE_MODAL_PATH, active_fields)
