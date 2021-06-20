@@ -1,15 +1,28 @@
-<form id='create_form' method='POST' action='/bookstore/add/'>
+<form id='create_form' method='POST' action={%if selected %}'/bookstore/update/{{selected.id}}/'{% else%}
+    '/bookstore/add/'{%endif%}>
 {%csrf_token %}
 <h1>Search Book</h1>
 <div style="display:flex;flex-direction:column">
+
 <label>Select Book
-<select required name='book_id' class="js-data-example-ajax" style="width:200px;position:inherit;margin-bottom:10px"placeholder="Type Book name..">
+<select required onchange="fetch_details(this.value)" name='book_id' class="js-data-example-ajax" style="width:200px;position:inherit;margin-bottom:10px"placeholder="Type Book name..">
 {% if selected%}  <option value="{{ selected.book_id }}" selected="selected">{{selected.name}}</option>{% endif %}
 </select>  
 </label>
 <label>Select Stock
 <input name='stock' type="number" required {%if selected %}value="{{selected.stock}}"{%endif%}></input>
+<div id='select_block' style="display:{%if selected %}flex{% else %}none{% endif %};flex-direction:column">   
+<img id='photo' {%if selected %}src="{{ thumbnail }}"{%endif%} style="display: block;
+  margin-left: auto;
+  margin-right: auto;
+  height:50%;
+  width: 50%;padding:10px"></img> 
+<label>Author: <p id="author"> {%if selected %}{{ author }}{%endif%}</p></label>
+<label>Publisher: <p id="publisher">{%if selected %}{{ publisher }}{%endif%}</p></label>
+<label>Publishing Date: <p id="publishing_date">{%if publishing_date %}{{ publishing_date }}{%endif%}</p></label>
 </label>  
+</div>
+
 </div>
 <div class="clearfix">
 <button type="button" onclick="hide_modal()" class="cancelbtn">Cancel</button>
@@ -25,13 +38,10 @@ $('.js-data-example-ajax').select2({
     dataType: 'json',
     processResults: function (data) {
         let data_array = []
-    
         $.each(data.items,function(index,value){
-            console.log(value)
             data_array.push({
                 'id' : value.id,'text':value.volumeInfo.title})
         });
-        console.log(data_array)
       return {results: data_array};
     }   
   }
@@ -42,4 +52,22 @@ $('#create_form').submit(function(eventObj) {
     $(this).append('<input type="hidden" name="name" value="'+text+'" />');
     return true;
 });
+
+function fetch_details(book_id){  
+  let url = 'https://www.googleapis.com/books/v1/volumes/'+ book_id+ '/'
+    $.ajax({
+    type : "GET",
+    url : url,
+    datatype : "text/plain",
+    contentType: "json",
+    success : function(result) {
+      document.getElementById('select_block').style.display = 'flex'
+      document.getElementById('author').innerText  = result['volumeInfo']['authors'][0]
+      document.getElementById('publisher').innerText = result['volumeInfo']['publisher']
+      document.getElementById('publishing_date').innerText = result['volumeInfo']['publishedDate']
+      document.getElementById('photo').src = result['volumeInfo']['imageLinks']['smallThumbnail']
+    },error : function(error) {
+    },
+    });
+}
 </script>

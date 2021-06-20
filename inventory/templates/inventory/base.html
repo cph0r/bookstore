@@ -17,7 +17,13 @@
 <div>
 
 {% include "inventory/table/script.html" %}
-
+{% if messages %}
+<script>
+{% for message in messages %}
+    alert('{{message}}')
+{% endfor%}
+</script>
+{% endif %}
 </body>
 </html>
 

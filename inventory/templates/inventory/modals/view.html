@@ -1,9 +1,19 @@
-<h1>Viw Book</h1>
+<h1>View Book</h1>
 <div style="display:flex;flex-direction:column" >
+<img src='{{ thumbnail }}' alt="image" style="display: block;
+  margin-left: auto;
+  margin-right: auto;
+  height:50%;
+  width: 50%;padding:10px"></img>
 <label>Name : {{ selected.name }}</label>
 <label>Stock : {{ selected.stock }}</label>
-<label>Added on : {{ selected.added_at|date}}</label>
-{%if selected.modified_at %}<label>Modified on :  {{ selected.name}}</label>{% endif %}
+<label>Author : {{ author }}</label>
+<label>Publisher : {{ publisher }}</label>
+<label>Publishing Date : {{ publishing_date }}</label>
+<label>Pages : {{ page_count }}</label>
+<label>Language : {{ language }}</label>
+<label>Added on : {{ selected.added_at}}</label>
+{%if selected.modified_at %}<label>Modified on :  {{ selected.modified_at}}</label>{% endif %}
 </div>
 <button type="button" onclick="hide_modal()" class="cancelbtn">Cancel</button>
 </div>

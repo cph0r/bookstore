@@ -2,74 +2,91 @@ import datetime
 
 from django.http import HttpResponse
 from django.http.response import JsonResponse
-from django.shortcuts import render
-
+from django.shortcuts import redirect, render
+from django.contrib import messages
 import inventory.models as models
 from .constants import *
+import requests
 
 def index(request):
-    if request.method == POST:
-        print(POST)
     records = getattr(models, BOOK_STORE_TABLE).objects.all();
     return render(request, BASE_PATH, {ENTRIES:records})
 
 
 def add(request):
     if request.method == POST :
-        print(POST)
-        print(request.POST)
-        try:
+        book_id = request.POST.get(BOOK_ID)
+        count = getattr(
+                models, BOOK_STORE_TABLE).objects.filter(**{BOOK_ID:book_id}).count()
+        if count > 0:
+            messages.error(request,DUPLICATE)
+        else:
             entry_map = {NAME: request.POST.get(NAME),
-                         STOCK: request.POST.get(STOCK),
-                         BOOK_ID:request.POST.get(BOOK_ID)}
-            append_creation_details(entry_map,ADDED_AT)
-            print(entry_map)
-            record = getattr(
+                        STOCK: request.POST.get(STOCK),
+                        BOOK_ID:book_id,ADDED_AT:datetime.datetime.now()}
+            getattr(
                 models, BOOK_STORE_TABLE).objects.update_or_create(**entry_map)
-            data = {RESPONSE: SUCCESS}
-        except Exception as ex:
-            print(ex)
-            data = {RESPONSE: FAILURE}
-        return JsonResponse(data, safe=False)
+            messages.success(request,SUCCESS)
+        return redirect(MAIN_VIEW)
     return render(request, BASE_MODAL_PATH, {INPUT_PATH:CREATE_PATH})
 
 
 def delete(request, book_id):
     if request.method == POST:
-        print(POST)
         try:
-            record = getattr(models, BOOK_STORE_TABLE).objects.get(
+            getattr(models, BOOK_STORE_TABLE).objects.get(
                 pk=book_id).delete()
-            data = {RESPONSE: SUCCESS}
+            messages.success(request,SUCCESS)
         except Exception as ex:
-            data = {RESPONSE: FAILURE}
-        return JsonResponse(data, safe=False)
-    return render(request,  BASE_MODAL_PATH, {INPUT_PATH:DELETE_PATH})
+            messages.error(request,ERROR)
+        return redirect(MAIN_VIEW)
+    return render(request,  BASE_MODAL_PATH, {INPUT_PATH:DELETE_PATH,BOOK_ID:book_id})
 
 
 def view(request, book_id):
-    print(book_id,request.GET)
     record = getattr(models, BOOK_STORE_TABLE).objects.get(pk=book_id)
-    return render(request, BASE_MODAL_PATH, {INPUT_PATH:VIEW_PATH,SELECTED:record})
+    master_book_id = getattr(record,BOOK_ID)
+    result = requests.get('https://www.googleapis.com/books/v1/volumes/'+master_book_id)
+    result = result.json()
+    active_fields = {INPUT_PATH:VIEW_PATH,SELECTED:record}
+    active_fields.update({
+    'author' : result['volumeInfo']['authors'][0],
+    'publisher' : result['volumeInfo']['publisher'],
+    'publishing_date' : result['volumeInfo']['publishedDate'],
+    'page_count' :result['volumeInfo']['pageCount'],
+    'thumbnail' : result['volumeInfo']['imageLinks']['smallThumbnail'],
+    'language' : result['volumeInfo']['language'].upper() })
+    return render(request, BASE_MODAL_PATH, active_fields)
 
 
 def update(request, book_id):
     if request.method == POST:
-        print(POST)
+        book_id_2 = request.POST.get(BOOK_ID)
         try:
+            getattr(models, BOOK_STORE_TABLE).objects.all().exclude(pk=book_id).get(**{BOOK_ID:book_id_2})
+            messages.error(request,DUPLICATE)
+        except Exception as ex:
+            print(ex)
             record = getattr(models, BOOK_STORE_TABLE).objects.get(pk=book_id)
+            name = request.POST.get(NAME)
             stock = request.POST.get(STOCK)
+            setattr(record, NAME, name)
+            setattr(record, BOOK_ID, book_id_2)
             setattr(record, STOCK, int(stock))
             setattr(record, MODIFIED_AT, datetime.datetime.now())
             record.save()
-            data = {RESPONSE: SUCCESS}
-        except Exception as ex:
-            data = {RESPONSE: FAILURE}
-        return JsonResponse(data, safe=False)
-
+            messages.success(request,SUCCESS)
+        return redirect(MAIN_VIEW)
     record = getattr(models, BOOK_STORE_TABLE).objects.get(pk=book_id)
-    return render(request, BASE_MODAL_PATH, {INPUT_PATH:CREATE_PATH,SELECTED:record})
-
-
-def append_creation_details(entry_map, key):
-    entry_map[key] = datetime.datetime.now()
+    active_fields = {INPUT_PATH:CREATE_PATH,SELECTED:record}
+    master_book_id = getattr(record,BOOK_ID)
+    result = requests.get('https://www.googleapis.com/books/v1/volumes/'+master_book_id)
+    result = result.json()
+    active_fields.update({
+    'author' : result['volumeInfo']['authors'][0],
+    'publisher' : result['volumeInfo']['publisher'],
+    'publishing_date' : result['volumeInfo']['publishedDate'],
+    'page_count' :result['volumeInfo']['pageCount'],
+    'thumbnail' : result['volumeInfo']['imageLinks']['smallThumbnail'],
+    'language' : result['volumeInfo']['language'].upper() })
+    return render(request, BASE_MODAL_PATH, active_fields)
