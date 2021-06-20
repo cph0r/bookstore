@@ -58,6 +58,7 @@ $('.js-data-example-ajax').select2({
 });
 
 $('#create_form').submit(function(eventObj) {
+    var data = $('#select_book').select2('data');
     let text = data[0].text.trim()
     $(this).append('<input type="hidden" name="name" value="'+text+'" />');
     return true;
