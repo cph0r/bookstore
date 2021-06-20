@@ -1,7 +1,10 @@
-<h1>Delete Account</h1>
-<p>Are you sure you want to delete the book</p>
-<div class="clearfix">
+<h1>Viw Book</h1>
+<div style="display:flex;flex-direction:column" >
+<label>Name : {{ selected.name }}</label>
+<label>Stock : {{ selected.stock }}</label>
+<label>Added on : {{ selected.added_at|date}}</label>
+{%if selected.modified_at %}<label>Modified on :  {{ selected.name}}</label>{% endif %}
+</div>
 <button type="button" onclick="hide_modal()" class="cancelbtn">Cancel</button>
-<button type="button" onclick="hide_modal()" class="deletebtn">Delete</button>
 </div>
     

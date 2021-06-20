@@ -2,28 +2,30 @@
     <thead>
         <tr>
             <th>Book Name</th>
-            <th>Stock</th>
-            <th>Action</th>
-        </tr>
+            <th style="text-align:center">Stock</th>
+            <th style="text-align:center">Action</th>
+        </tr> 
     </thead>
     <tbody>
+    {% for entry in entries %}
         <tr>
-            <td>Row 1 Data 1</td>
-            <td>Row 1 Data 2</td>
+            <td>{{ entry.name }}</td>
+            <td style="text-align:center" >{{ entry.stock }}</td>
             <td style="display:flex;flex-">
 
-            <button type='button' class="btn btn-default" onclick="crud('view')">
+            <button type='button' class="btn btn-default" onclick="crud('view',{{ entry.id }})">
             <i class="fa fa-eye"></i>      
             </button>
 
-            <button type='button' class="btn btn-default" onclick="crud('delete')">
-            <i class="fas fa-trash-alt"></i>      
+            <button type='button' class="btn btn-default" onclick="crud('delete',{{ entry.id }})">
+            <i class="fa fa-trash"></i>      
             </button>
 
-            <button type='button' class="btn btn-default" onclick="crud('update')">
+            <button type='button' class="btn btn-default" onclick="crud('update',{{ entry.id}})">
             <i class="fa fa-edit"></i>      
             </button>
             </td>
         </tr>
+        {% endfor %}
     </tbody>
 </table>

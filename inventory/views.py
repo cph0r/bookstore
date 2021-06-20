@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.http.response import JsonResponse
 from django.shortcuts import render
 
-from .models import *
+import inventory.models as models
 from .constants import *
 import requests
 
@@ -12,7 +12,10 @@ import requests
 def index(request):
     if request.POST == POST:
         print(POST)
-    return render(request, BASE_PATH, {})
+    records = getattr(models, BOOK_STORE_TABLE).objects.all();
+    print(records)
+    print(records.count())
+    return render(request, BASE_PATH, {ENTRIES:records})
 
 
 def add(request):
@@ -45,8 +48,9 @@ def delete(request, book_id):
 
 
 def view(request, book_id):
+    print(book_id,request.GET)
     record = getattr(models, BOOK_STORE_TABLE).objects.get(pk=book_id)
-    return render(request, BASE_MODAL_PATH, {INPUT_PATH:VIEW_PATH})
+    return render(request, BASE_MODAL_PATH, {INPUT_PATH:VIEW_PATH,SELECTED:record})
 
 
 def update(request, book_id):
